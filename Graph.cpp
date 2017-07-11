@@ -107,6 +107,10 @@ vector<int> Graph::vertDegree()
     return ansf;
 }
 
+/*--------------------------*/
+/*---- Greedy Algorithm ----*/
+/*--------------------------*/
+
 bool Graph::isClique(vector<int> part)
 {
     for (int i = 0; i < part.size(); i++)
@@ -121,6 +125,7 @@ bool Graph::isClique(vector<int> part)
     }
     return true;
 }
+
 
 vector<vector<int> > Graph::cliquePartGreedy()
 {
@@ -193,6 +198,10 @@ vector<vector<int> > Graph::cliquePartGreedy()
     }
     return ans;
 }
+
+/*--------------------------*/
+/*---- Branch and Bound ----*/
+/*--------------------------*/
 
 vector<vector<int> > Graph::insertInPartition (vector<vector<int> > part, int elem)
 {
@@ -323,6 +332,44 @@ vector<vector<int> > Graph::cliquePartBTE(double timelimit)
     return ans;
 }
 
+/*------------------------------*/
+/*----  Genetic Algorithm   ----*/
+/*------------------------------*/
+
+vector<int> crossover(solution p1, solution p2)
+{
+    vector<int> ans;
+    
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine generator(seed);
+    uniform_int_distribution<int> distribution(0, p1.genotype.size() - 1);
+    int cutp = distribution(generator);
+    
+    for (int i = 0; i < cutp; i++) {
+        ans.push_back(p1.genotype[i]);
+    }
+    
+    for (int i = 0; i < p2.genotype.size(); i++) {
+        int candidate = p2.genotype[i];
+        bool present = false;
+        
+        for (int j = 0; j < ans.size(); j++) {
+            if (candidate == ans[j]) {
+                present = true;
+            }
+        }
+        if (!present) {
+            ans.push_back(candidate);
+        }
+    }
+    
+    return ans;
+}
+
+bool comp (solution s1, solution s2)
+{
+	return (s1.Fitness < s2.Fitness);
+}
 
 vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
 {
@@ -331,24 +378,81 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     
     vector<solution> solspace;
     
+    /*----------------------------------------*/
+    /*---- Generate Population for the GA ----*/
+    /*----------------------------------------*/
+    
+    cout << "INITIAL:" << endl;
+    
     for (int i = 0; i < popsize; i++)
     {
         solution s(V);
-        s.disp();
-        cout << endl;
+        
+        int j = 0;
+        while (j < s.genotype.size())
+        {
+            s.partition = insertInPartition(s.partition, s.genotype[j]);
+            j++;
+        }
+        
+        s.Fitness = s.partition.size();
+        cout << s.Fitness << endl;
         solspace.push_back(s);
     }
     
+    cout << endl;
+    
+    /*-------------------*/
+    /*---- Main Loop ----*/
+    /*-------------------*/
+    
+    int epochs = 0;
     while (time < timelimit)
     {
+        int numberofsons = solspace.size()/2;
         start = clock();
-        time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));
+        
+        int j = 0;
+        while (j < numberofsons) {
+            
+            unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+            default_random_engine generator(seed);
+            uniform_int_distribution<int> distribution(0, solspace.size()-1);
+            
+            solution son(V);
+            son.genotype = crossover(solspace[distribution(generator)], solspace[distribution(generator)]);
+            
+            int k = 0;
+            while (k < son.genotype.size())
+            {
+                son.partition = insertInPartition(son.partition, son.genotype[k]);
+                k++;
+            }
+            
+            son.Fitness = son.partition.size();
+            
+            solspace.push_back(son);
+            j++;
+        }
+        
+        sort(solspace.begin(), solspace.end(), comp);
+        solspace.erase(solspace.end()-numberofsons, solspace.end());
+        
         stop = clock();
+        time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));
+        epochs++;
     }
-    /*
-    cout << "best found: " << ans.size() << endl;
+    
+    cout << "AFTER ALGORITHM: " << endl;
+    int j = 0;
+    while (j < solspace.size()) {
+        cout << solspace[j].Fitness << endl;
+        j++;
+    }
+    
+    cout << "best found: " << solspace[0].partition.size() << endl;
+    cout << "Epochs: " << epochs << endl;
     cout << "elapsed time (Heuristic): " << time << " s" << endl;
-    return ans;
-    */
-    return cliquePartGreedy();
+    
+    return solspace[0].partition;
 }

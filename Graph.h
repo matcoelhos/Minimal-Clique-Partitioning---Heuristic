@@ -8,6 +8,7 @@
 #include <vector>
 #include <ctime>
 #include <climits>
+#include <random>		
 #include "solution.h"
 
 using namespace std;

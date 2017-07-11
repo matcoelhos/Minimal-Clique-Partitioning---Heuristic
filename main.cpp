@@ -60,11 +60,10 @@ int main(int argc, char * argv[])
     cout << "Verts: " << G->V << endl;
     cout << "Edges: " << G->E << endl << endl;
 
-    clock_t start, stop;
-    double laricielle, interval;
     vector<vector<int> > part;
-
-    part = G->cliquePartBTGA(1, 10);
+    
+    G->cliquePartBTE(stoi(argv[2]));
+    part = G->cliquePartBTGA(stoi(argv[2]), 20);
 /*
     cout << "writing to output file" << endl;
 

@@ -14,6 +14,7 @@
 #include <vector>       // std::vector
 #include <ctime>        // std::time
 #include <cstdlib>
+#include <chrono>
 
 using namespace std;
 
@@ -28,6 +29,8 @@ public:
     
     //GA genotype
     vector<int> genotype;
+    //
+    vector<vector<int>> partition;
     //Fitness
     int Fitness;
 };

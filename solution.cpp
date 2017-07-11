@@ -10,6 +10,9 @@
 
 using namespace std;
 
+int seed (int i) {return (chrono::system_clock::now().time_since_epoch().count())%i;}
+
+
 solution::solution(int size)
 {
     srand ( unsigned ( std::time(0) ) );
@@ -18,7 +21,7 @@ solution::solution(int size)
     for (int i=0; i<size; ++i) genotype.push_back(i);
     
     // using built-in random generator:
-    random_shuffle ( genotype.begin(), genotype.end());
+    random_shuffle ( genotype.begin(), genotype.end(), seed);
 }
 
 void solution::disp()

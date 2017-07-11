@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char * argv[])
 {
     stringstream ss;
-    ss << "test" << argv[1];
+    ss << "test " << argv[1];
 
     Graph * G = NULL;
     char c;
@@ -63,11 +63,9 @@ int main(int argc, char * argv[])
     clock_t start, stop;
     double laricielle, interval;
     vector<vector<int> > part;
-    laricielle = (double)stoi(argv[2]);
 
-    /*if (G->V <= 10)*/ part = G->cliquePartBTE(laricielle);
-    //else part = G->cliquePartBTH(laricielle);
-
+    part = G->cliquePartBTGA(1, 10);
+/*
     cout << "writing to output file" << endl;
 
     ofstream outfile;
@@ -83,6 +81,7 @@ int main(int argc, char * argv[])
         }
     }
     outfile.close();
+ */
     cout << "done" << endl;
 
     delete G;

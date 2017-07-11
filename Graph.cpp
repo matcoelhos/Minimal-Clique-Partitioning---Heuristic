@@ -194,130 +194,6 @@ vector<vector<int> > Graph::cliquePartGreedy()
     return ans;
 }
 
-vector<vector<int> > Graph::cliquePartBTH(double timelimit)
-{
-    vector<vector<int> > ans;
-
-    ans = this->cliquePartGreedy();
-
-    //experimental upper bound
-    int alda = ans.size();
-
-    cout << "Experimental upper bound: " << alda << endl;
-
-    double time = 0;
-    clock_t start, stop;
-
-    int vin = 0;
-    while (time < timelimit && (vin < V))
-    {
-        start = clock();
-        vector<vector<int> > newsol;
-        vector<int> removeList;
-        vector<int> deg;
-        deg = vertDegree();
-        int posbig = vin;
-
-        //creating remove list
-        for (int i = 0; i < V; i++) removeList.push_back(i);
-        //sorting remove list
-        for (int i = 0; i < V-1; i++)
-        {
-            int biggest = removeList[i], posbig = i;
-            for (int j = i+1; j < V; j++)
-            {
-                if (deg[removeList[posbig]] > deg[removeList[j]])
-                {
-                    biggest = removeList[j];
-                    posbig = j;
-                }
-            }
-            removeList.erase(removeList.begin() + posbig);
-            removeList.insert(removeList.begin() + i, biggest);
-        }
-        //remove list loop
-        while (removeList.size() > 0 && newsol.size() < alda)
-        {
-            vector<int> clique;
-            //select remove node from remove list
-            if (removeList.size() != V)
-            {
-                int biggest = INT_MAX;
-                posbig = -1;
-                //finding node with biggest degree
-                for (int i = 0; i < removeList.size(); i++)
-                {
-                    if (biggest > deg[removeList[i]])
-                    {
-                        biggest = deg[removeList[i]];
-                        posbig = removeList[i];
-                    }
-                }
-            }
-            //insert candidate node in clique
-            clique.push_back(posbig);
-
-            //finding biggest clique from biggest degree node
-            vector<int> visitlist;
-            for (int j = 0; j < V; j++)
-            {
-                vector<int> p;
-                p.push_back(posbig);
-                p.push_back(j);
-                if(existEdge(p) && existEl(removeList, j))
-                {
-                    visitlist.push_back(j);
-                }
-            }
-            while (visitlist.size() > 0)
-            {
-                int lbiggest = INT_MAX, posbigl = -1, posl;
-                //search for neighbor with lowest degree
-                for (int j = 0; j < visitlist.size(); j++)
-                {
-                    if(deg[visitlist[j]] < lbiggest)
-                    {
-                        lbiggest = deg[visitlist[j]];
-                        posbigl = visitlist[j];
-                        posl = j;
-                    }
-                }
-                //inserts neighbor node in candidate clique
-                clique.push_back(posbigl);
-                //pops last node if candidate clique is not valid
-                if (!isClique(clique))
-                {
-                    clique.pop_back();
-                }
-                visitlist.erase(visitlist.begin() + posl);
-            }
-            //remove clique's nodes from removelist
-            for (int i = 0; i < clique.size(); i++)
-            {
-                int rm = clique[i];
-                int iter = 0;
-                while (removeList[iter] != rm) iter ++;
-                removeList.erase(removeList.begin() + iter);
-            }
-            if (clique.size() > 0) newsol.push_back(clique);
-        }
-        //updates best solution found
-        if (newsol.size() < ans.size())
-        {
-            cout << "new best: " << newsol.size() << endl;
-            ans = newsol;
-            alda = ans.size();
-        }
-
-        vin++;
-        stop = clock();
-        time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));
-    }
-    cout << "best found: " << ans.size() << endl;
-    cout << "elapsed time (Heuristic): " << time << " s" << endl;
-    return ans;
-}
-
 vector<vector<int> > Graph::insertInPartition (vector<vector<int> > part, int elem)
 {
     bool inserted = false;
@@ -445,4 +321,34 @@ vector<vector<int> > Graph::cliquePartBTE(double timelimit)
     cout << "best found: " << ans.size() << endl;
     cout << "elapsed time (Branch and Bound): " << time << " s" << endl;
     return ans;
+}
+
+
+vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
+{
+    double time = 0;
+    clock_t start, stop;
+    
+    vector<solution> solspace;
+    
+    for (int i = 0; i < popsize; i++)
+    {
+        solution s(V);
+        s.disp();
+        cout << endl;
+        solspace.push_back(s);
+    }
+    
+    while (time < timelimit)
+    {
+        start = clock();
+        time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));
+        stop = clock();
+    }
+    /*
+    cout << "best found: " << ans.size() << endl;
+    cout << "elapsed time (Heuristic): " << time << " s" << endl;
+    return ans;
+    */
+    return cliquePartGreedy();
 }

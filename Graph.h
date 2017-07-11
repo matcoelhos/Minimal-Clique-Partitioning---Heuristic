@@ -8,6 +8,7 @@
 #include <vector>
 #include <ctime>
 #include <climits>
+#include "solution.h"
 
 using namespace std;
 
@@ -38,7 +39,7 @@ public:
     //option 1: Greedy with heuristics
     vector<vector<int> > cliquePartGreedy();
     //option 2: search for maxclique in every vertices
-    vector<vector<int> > cliquePartBTH(double timelimit);
+    vector<vector<int> > cliquePartBTGA(double timelimit, int popsize);
     //option 3: exact clique partitioning search
     vector<vector<int> > cliquePartBTE(double timelimit);
 private:

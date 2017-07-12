@@ -203,15 +203,15 @@ vector<vector<int> > Graph::cliquePartGreedy()
 /*---- Branch and Bound ----*/
 /*--------------------------*/
 
-vector<vector<int> > Graph::insertInPartition (vector<vector<int> > part, int elem)
+void Graph::insertInPartition (vector<vector<int>>* part, int elem)
 {
     bool inserted = false;
-    for (int i = 0; i < part.size() && !inserted; i++)
+    for (int i = 0; i < part->size() && !inserted; i++)
     {
-        part[i].push_back(elem);
-        if (!isClique(part[i]))
+        part->at(i).push_back(elem);
+        if (!isClique(part->at(i)))
         {
-            part[i].pop_back();
+            part->at(i).pop_back();
         }
         else inserted = true;
     }
@@ -220,9 +220,8 @@ vector<vector<int> > Graph::insertInPartition (vector<vector<int> > part, int el
     {
         vector<int> clq;
         clq.push_back(elem);
-        part.push_back(clq);
+        part->push_back(clq);
     }
-    return part;
 }
 
 vector<int> translate (vector<int> trList, vector<int> rmList)
@@ -300,7 +299,7 @@ vector<vector<int> > Graph::cliquePartBTE(double timelimit)
         int i = 0;
         while (i < roundList.size() && newans.size() < alda)
         {
-            newans = insertInPartition(newans,roundList[i]);
+            insertInPartition(&newans,roundList[i]);
             i++;
         }
 
@@ -339,6 +338,7 @@ vector<vector<int> > Graph::cliquePartBTE(double timelimit)
 vector<int> crossover(solution p1, solution p2)
 {
     vector<int> ans;
+    std::vector<bool> visited(p1.genotype.size(), false);
     
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine generator(seed);
@@ -347,18 +347,13 @@ vector<int> crossover(solution p1, solution p2)
     
     for (int i = 0; i < cutp; i++) {
         ans.push_back(p1.genotype[i]);
+        visited[p1.genotype[i]] = true;
     }
     
     for (int i = 0; i < p2.genotype.size(); i++) {
         int candidate = p2.genotype[i];
         bool present = false;
-        
-        for (int j = 0; j < ans.size(); j++) {
-            if (candidate == ans[j]) {
-                present = true;
-            }
-        }
-        if (!present) {
+        if (!visited[candidate]) {
             ans.push_back(candidate);
         }
     }
@@ -369,6 +364,22 @@ vector<int> crossover(solution p1, solution p2)
 bool comp (solution s1, solution s2)
 {
 	return (s1.Fitness < s2.Fitness);
+}
+
+void mutation (solution * s, double mprob)
+{
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine generator(seed);
+    uniform_int_distribution<int> distribution(0, s->genotype.size() - 1);
+    
+    double p = ((double)distribution(generator))/((double) s->genotype.size());
+    
+    if (p < mprob) {
+        int g1 = distribution(generator);
+        int g2 = distribution(generator);
+        
+        iter_swap(s->genotype.begin()+g1,s->genotype.begin()+g2);
+    }
 }
 
 vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
@@ -391,7 +402,7 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
         int j = 0;
         while (j < s.genotype.size())
         {
-            s.partition = insertInPartition(s.partition, s.genotype[j]);
+            insertInPartition(&(s.partition), s.genotype[j]);
             j++;
         }
         
@@ -406,42 +417,67 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     /*---- Main Loop ----*/
     /*-------------------*/
     
+    cout << "Running GA" << endl;
+    
     int epochs = 0;
     while (time < timelimit)
     {
         int numberofsons = solspace.size()/2;
         start = clock();
         
+        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+        default_random_engine generator(seed);
+        uniform_int_distribution<int> distribution(0, solspace.size()-1);
+        
         int j = 0;
-        while (j < numberofsons) {
-            
-            unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-            default_random_engine generator(seed);
-            uniform_int_distribution<int> distribution(0, solspace.size()-1);
-            
+        
+        /* Reprodução aleatória, sem elitismo */
+        
+        while (j < numberofsons)
+        {
             solution son(V);
             son.genotype = crossover(solspace[distribution(generator)], solspace[distribution(generator)]);
             
             int k = 0;
             while (k < son.genotype.size())
             {
-                son.partition = insertInPartition(son.partition, son.genotype[k]);
+                insertInPartition(&(son.partition), son.genotype[k]);
                 k++;
             }
             
             son.Fitness = son.partition.size();
+            mutation(&son,0.05);
             
             solspace.push_back(son);
             j++;
         }
         
-        sort(solspace.begin(), solspace.end(), comp);
-        solspace.erase(solspace.end()-numberofsons, solspace.end());
+        /* Seleção por torneio */
+        
+        for (int i = 0; i < numberofsons; i++)
+        {
+            int f1 = distribution(generator);
+            int f2 = distribution(generator);
+            
+            if (solspace[f1].Fitness < solspace[f2].Fitness)
+            {
+                solspace.erase(solspace.begin() + f2);
+            }
+            else
+            {
+                solspace.erase(solspace.begin() + f1);
+            }
+        }
         
         stop = clock();
         time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));
         epochs++;
+        printf("time: %f, epochs: %d\r", time, epochs);
     }
+    
+    cout << endl;
+    
+    sort(solspace.begin(), solspace.end(), comp);
     
     cout << "AFTER ALGORITHM: " << endl;
     int j = 0;

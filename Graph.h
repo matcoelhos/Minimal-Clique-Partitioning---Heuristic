@@ -8,7 +8,7 @@
 #include <vector>
 #include <ctime>
 #include <climits>
-#include <random>		
+#include <random>
 #include "solution.h"
 
 using namespace std;
@@ -55,7 +55,7 @@ private:
     //checks if a partition is a clique
     bool isClique(vector<int> part);
     //insert a node in partition
-    vector<vector<int> > insertInPartition (vector<vector<int> > part, int elem);
+    void insertInPartition (vector<vector<int>> * part, int elem);
 };
 
 #endif // GRAPH_H_INCLUDED

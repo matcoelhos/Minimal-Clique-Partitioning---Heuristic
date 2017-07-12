@@ -62,7 +62,7 @@ int main(int argc, char * argv[])
 
     vector<vector<int> > part;
     
-    G->cliquePartBTE(stoi(argv[2]));
+    //G->cliquePartBTE(stoi(argv[2]));
     part = G->cliquePartBTGA(stoi(argv[2]), 20);
 /*
     cout << "writing to output file" << endl;

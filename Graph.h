@@ -2,6 +2,7 @@
 #define GRAPH_H_INCLUDED
 
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>

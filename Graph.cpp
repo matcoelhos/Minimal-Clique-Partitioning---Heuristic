@@ -378,7 +378,7 @@ void mutation (solution * s, double mprob)
         int g1 = distribution(generator);
         int g2 = distribution(generator);
         
-        iter_swap(s->genotype.begin()+g1,s->genotype.begin()+g2);
+        random_shuffle(s->genotype.begin()+min(g1,g2),s->genotype.begin()+max(g1,g2));
     }
 }
 
@@ -393,8 +393,6 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     /*---- Generate Population for the GA ----*/
     /*----------------------------------------*/
     
-    cout << "INITIAL:" << endl;
-    
     for (int i = 0; i < popsize; i++)
     {
         solution s(V);
@@ -407,7 +405,6 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
         }
         
         s.Fitness = s.partition.size();
-        cout << s.Fitness << endl;
         solspace.push_back(s);
     }
     
@@ -472,19 +469,12 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
         stop = clock();
         time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));
         epochs++;
-        printf("time: %f, epochs: %d\r", time, epochs);
+        printf("time: %f, epochs: %d\n", time, epochs);
     }
     
     cout << endl;
     
     sort(solspace.begin(), solspace.end(), comp);
-    
-    cout << "AFTER ALGORITHM: " << endl;
-    int j = 0;
-    while (j < solspace.size()) {
-        cout << solspace[j].Fitness << endl;
-        j++;
-    }
     
     cout << "best found: " << solspace[0].partition.size() << endl;
     cout << "Epochs: " << epochs << endl;

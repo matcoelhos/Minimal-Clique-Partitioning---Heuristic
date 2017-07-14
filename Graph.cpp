@@ -408,7 +408,6 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
         solspace.push_back(s);
     }
     
-    cout << endl;
     
     /*-------------------*/
     /*---- Main Loop ----*/
@@ -419,7 +418,7 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     int epochs = 0;
     while (time < timelimit)
     {
-        int numberofsons = solspace.size()*2;
+        int numberofsons = solspace.size()/4;
         start = clock();
         
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();

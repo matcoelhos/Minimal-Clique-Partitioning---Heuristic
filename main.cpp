@@ -13,7 +13,7 @@ int main(int argc, char * argv[])
     vector<string> filelist;
     ifstream listfile;
     
-    listfile.open("bmckList.txt");
+    listfile.open("benchdagalera.txt");
     string s;
     while (getline(listfile, s))
     {
@@ -30,14 +30,14 @@ int main(int argc, char * argv[])
     
     int index = 0;
     while (index < filelist.size()) {
-    
+        
         stringstream ss;
     
         ss << "Benchmark/" << filelist[index];
         Graph * G = NULL;
         char c;
 
-        cout << "start up!" << endl;
+        cout << "File: " << filelist[index] << endl;
         
         
         ifstream infile(ss.str());
@@ -92,6 +92,8 @@ int main(int argc, char * argv[])
     
         delete G;
         index ++;
+        
+        cout << endl;
     }
     resultfile.close();
     return 0;

@@ -382,6 +382,18 @@ void mutation (solution * s, double mprob)
     }
 }
 
+
+void Graph::calcFitness (solution * s)
+{
+    int j = 0;
+    while (j < s->genotype.size())
+    {
+        insertInPartition(&(s->partition), s->genotype[j]);
+        j++;
+    }
+    s->Fitness = s->partition.size();
+}
+
 vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
 {
     double time = 0;
@@ -396,16 +408,13 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     for (int i = 0; i < popsize; i++)
     {
         solution s(V);
-        
-        int j = 0;
-        while (j < s.genotype.size())
-        {
-            insertInPartition(&(s.partition), s.genotype[j]);
-            j++;
-        }
-        
-        s.Fitness = s.partition.size();
         solspace.push_back(s);
+    }
+    
+    
+    for (int i = 0; i < popsize; i++)
+    {
+        calcFitness(&(solspace[i]));
     }
     
     

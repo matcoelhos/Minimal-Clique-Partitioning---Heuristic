@@ -57,6 +57,8 @@ private:
     bool isClique(vector<int> part);
     //insert a node in partition
     void insertInPartition (vector<vector<int>> * part, int elem);
+    //calculates fitness for an GA
+    void calcFitness (solution * s);
 };
 
 #endif // GRAPH_H_INCLUDED

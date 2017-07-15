@@ -86,7 +86,7 @@ int main(int argc, char * argv[])
         vector<vector<int> > part;
     
         //G->cliquePartBTE(stoi(argv[2]));
-        part = G->cliquePartBTGA(stoi(argv[1]), 40);
+        part = G->cliquePartBTGA(stoi(argv[1]), 20);
         
         resultfile << filelist[index] << "\t" << part.size() << endl;
     

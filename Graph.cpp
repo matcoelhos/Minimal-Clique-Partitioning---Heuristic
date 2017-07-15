@@ -423,8 +423,6 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     }
     threadvec.clear();
     
-    sort(solspace.begin(), solspace.end(), comp);
-    
     /*-------------------*/
     /*---- Main Loop ----*/
     /*-------------------*/
@@ -465,10 +463,8 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
         }
         threadvec.clear();
         
-        sort(solspace.begin(), solspace.end(), comp);
-        
         /* Seleção por torneio */
-        /*
+        
         for (int i = 0; i < numberofsons; i++)
         {
             uniform_int_distribution<int> dist(0, solspace.size()-1);
@@ -484,9 +480,8 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
             {
                 solspace.erase(solspace.begin() + f1);
             }
-        }*/
+        }
         
-        solspace.erase(solspace.end()-numberofsons, solspace.end());
         
         stop = clock();
         time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));

@@ -10,6 +10,8 @@
 #include <ctime>
 #include <climits>
 #include <random>
+#include <mingw.thread.h>   //MINGW Windows (must be included in directory)
+// #include <thread>
 #include "solution.h"
 
 using namespace std;
@@ -36,6 +38,8 @@ public:
     void removeEdge(vector<int> par);
     //displays the adjacency matrix
     void disp();
+    //insert a node in partition
+    void insertInPartition (vector<vector<int>> * part, int elem);
 
     ///clique partitioning
     //option 1: Greedy with heuristics
@@ -55,10 +59,6 @@ private:
     vector<int> vertDegree();
     //checks if a partition is a clique
     bool isClique(vector<int> part);
-    //insert a node in partition
-    void insertInPartition (vector<vector<int>> * part, int elem);
-    //calculates fitness for an GA
-    void calcFitness (solution * s);
 };
 
 #endif // GRAPH_H_INCLUDED

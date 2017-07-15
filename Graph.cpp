@@ -395,6 +395,14 @@ void calcFitness (solution * s, Graph * G)
     s->Fitness = s->partition.size();
 }
 
+void calcThread(vector<solution> * v, int bg, int end, Graph * G)
+{
+    for (int i = bg; i < end; i++)
+    {
+        calcFitness(&(v->at(i)), G);
+    }
+}
+
 vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
 {
     double time = 0;
@@ -413,9 +421,14 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
         solspace.push_back(s);
     }
     
-    for (int i = 0; i < popsize; i++)
+    /*Cálculo do fitness*/
+    int nthreads = 5;
+    int interval = min(popsize / nthreads, 1);
+    for (int i = 0; i < popsize; i+= interval)
     {
-        threadvec.push_back(thread(calcFitness, &(solspace[i]), this));
+        int begin = i;
+        int end = min(begin+interval, popsize);
+        threadvec.push_back(thread(calcThread, &(solspace), begin, end, this));
     }
     for (int i = 0; i < threadvec.size(); i++)
     {
@@ -432,7 +445,7 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     int epochs = 0;
     while (time < timelimit)
     {
-        int numberofsons = (solspace.size()*3);
+        int numberofsons = (solspace.size()/4);
         start = clock();
         
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
@@ -453,9 +466,13 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
             j++;
         }
         
-        for (int i = solspace.size() - numberofsons; i < solspace.size(); i++)
+        /* Cálculo do Fitness (Paralelo)*/
+        interval = min(popsize / nthreads, 1);
+        for (int i = solspace.size() - numberofsons; i < solspace.size(); i+=interval)
         {
-            threadvec.push_back(thread(calcFitness, &(solspace[i]), this));
+            int begin = i;
+            int end = min(begin+interval, (int)solspace.size());
+            threadvec.push_back(thread(calcThread, &(solspace), begin, end, this));
         }
         for (int i = 0; i < threadvec.size(); i++)
         {

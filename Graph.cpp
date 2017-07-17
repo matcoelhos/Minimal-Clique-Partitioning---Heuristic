@@ -383,12 +383,12 @@ void mutation (solution * s, double mprob)
 }
 
 
-void Graph::calcFitness (solution * s)
+void calcFitness (solution * s, Graph * G)
 {
     int j = 0;
     while (j < s->genotype.size())
     {
-        insertInPartition(&(s->partition), s->genotype[j]);
+        G->insertInPartition(&(s->partition), s->genotype[j]);
         j++;
     }
     s->Fitness = s->partition.size();
@@ -400,6 +400,7 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     clock_t start, stop;
     
     vector<solution> solspace;
+    vector<thread> threadvec;
     
     /*----------------------------------------*/
     /*---- Generate Population for the GA ----*/
@@ -414,9 +415,15 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     
     for (int i = 0; i < popsize; i++)
     {
-        calcFitness(&(solspace[i]));
+        threadvec.push_back(thread(calcFitness,&(solspace[i]), this));
     }
+    for (int i = 0; i < threadvec.size(); i++)
+    {
+        threadvec[i].join();
+    }
+    threadvec.clear();
     
+    sort(solspace.begin(), solspace.end(), comp);
     
     /*-------------------*/
     /*---- Main Loop ----*/
@@ -427,42 +434,43 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
     int epochs = 0;
     while (time < timelimit)
     {
-        int numberofsons = solspace.size()/4;
+        int numberofsons = (solspace.size()*2)/3;
         start = clock();
-        
+        uniform_int_distribution<int> distribution(0, solspace.size()-1);
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
         default_random_engine generator(seed);
-        uniform_int_distribution<int> distribution(0, solspace.size()-1);
-        
-        int j = 0;
         
         /* Reprodução aleatória, sem elitismo */
-        
+        int j = 0;
         while (j < numberofsons)
         {
             solution son(V);
             son.genotype = crossover(solspace[distribution(generator)], solspace[distribution(generator)]);
             
-            int k = 0;
-            while (k < son.genotype.size())
-            {
-                insertInPartition(&(son.partition), son.genotype[k]);
-                k++;
-            }
-            
-            son.Fitness = son.partition.size();
-            mutation(&son,0.05);
-            
             solspace.push_back(son);
             j++;
         }
         
-        /* Seleção por torneio */
+        for (int i = solspace.size()-numberofsons; i < solspace.size(); i++)
+        {
+            threadvec.push_back(thread(calcFitness,&(solspace[i]), this));
+        }
+        for (int i = 0; i < threadvec.size(); i++)
+        {
+            threadvec[i].join();
+        }
+        threadvec.clear();
         
+        sort(solspace.begin(), solspace.end(), comp);
+        solspace.erase(solspace.end()-numberofsons, solspace.end());
+        
+        /* Seleção por torneio */
+        /*
         for (int i = 0; i < numberofsons; i++)
         {
-            int f1 = distribution(generator);
-            int f2 = distribution(generator);
+            uniform_int_distribution<int> dist(0, solspace.size()-1);
+            int f1 = dist(generator);
+            int f2 = dist(generator);
             
             if (solspace[f1].Fitness < solspace[f2].Fitness)
             {
@@ -472,7 +480,9 @@ vector<vector<int> > Graph::cliquePartBTGA(double timelimit, int popsize)
             {
                 solspace.erase(solspace.begin() + f1);
             }
-        }
+        }*/
+        
+        
         
         stop = clock();
         time += (((double)(stop - start))/((double)CLOCKS_PER_SEC));

@@ -16,6 +16,7 @@ gen400_p0.9_75.clq
 hamming8-4.clq
 keller4.clq
 keller5.clq
+MANN_a27.clq
 p_hat300-1.clq
 p_hat300-2.clq
 p_hat300-3.clq

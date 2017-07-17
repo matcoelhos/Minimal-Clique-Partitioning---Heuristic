@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
     
     stringstream fs;
     
-    fs << "result" << argv[1] << ".txt";
+    fs << "result.txt";
     
     ofstream resultfile;
     resultfile.open(fs.str());
@@ -86,9 +86,13 @@ int main(int argc, char * argv[])
         vector<vector<int> > part;
     
         //G->cliquePartBTE(stoi(argv[2]));
-        part = G->cliquePartBTGA(stoi(argv[1]), 50);
-        resultfile << filelist[index] << "\t" << part.size() << endl;
-    
+        resultfile << filelist[index] << "\t";
+        for (int i = 10; i <= 60; i +=10)
+        {
+            part = G->cliquePartBTGA(i, 20);
+            resultfile << part.size() << "\t";
+        }
+        resultfile << endl;
         delete G;
         index ++;
         

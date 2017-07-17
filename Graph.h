@@ -10,6 +10,7 @@
 #include <ctime>
 #include <climits>
 #include <random>
+//#include <mingw.thread.h>   //MINGW Windows (must be included in directory)
 #include <thread>
 #include "solution.h"
 

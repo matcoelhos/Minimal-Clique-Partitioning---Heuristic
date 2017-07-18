@@ -21,83 +21,89 @@ int main(int argc, char * argv[])
     }
     listfile.close();
     
-    stringstream fs;
     
-    fs << "result.txt";
+    for (int pop = 10; pop <= 80; pop += 10)
+    {
+        stringstream fs;
     
-    ofstream resultfile;
-    resultfile.open(fs.str());
+        fs << "result_p" << pop << ".txt";
+        cout << "Pop: " << pop << endl;
     
-    int index = 0;
-    while (index < filelist.size()) {
+        ofstream resultfile;
+        resultfile.open(fs.str());
+    
+        int index = 0;
+        while (index < filelist.size()) {
         
-        stringstream ss;
+            stringstream ss;
     
-        ss << "Benchmark/" << filelist[index];
-        Graph * G = NULL;
-        char c;
+            ss << "Benchmark/" << filelist[index];
+            Graph * G = NULL;
+            char c;
 
-        cout << "File: " << filelist[index] << endl;
+            cout << "File: " << filelist[index] << endl;
         
         
-        ifstream infile(ss.str());
-        if (!infile)
-        {
-            cout << "ARQUIVO INDISPONIVEL" << endl;
-            return 3;
-        };
-
-        string line;
-        while (getline(infile, line))
-        {
-            istringstream i(line);
-
-            char control;
-            i >> control;
-            if (control == 'p')
+            ifstream infile(ss.str());
+            if (!infile)
             {
-                string s;
-                int verts, a;
-                i >> s >> verts >> a;
-                G = new Graph(verts);
+                cout << "ARQUIVO INDISPONIVEL" << endl;
+                return 3;
+            };
 
-            }
-            else if (control == 'e' && G != NULL)
+            string line;
+            while (getline(infile, line))
             {
-                vector<int> ins;
-                int v1, v2;
-                i >> v1 >> v2;
-                ins.push_back(v1-1);
-                ins.push_back(v2-1);
-                G->insertEdge(ins);
+                istringstream i(line);
+
+                char control;
+                i >> control;
+                if (control == 'p')
+                {
+                    string s;
+                    int verts, a;
+                    i >> s >> verts >> a;
+                    G = new Graph(verts);
+
+                }
+                else if (control == 'e' && G != NULL)
+                {
+                    vector<int> ins;
+                    int v1, v2;
+                    i >> v1 >> v2;
+                    ins.push_back(v1-1);
+                    ins.push_back(v2-1);
+                    G->insertEdge(ins);
+                }
             }
-        }
-        infile.close();
+            infile.close();
 
-        if (G == NULL)
-        {
-            cout << "ALERTA! GRAFO NAO INICIALIZADO" << endl;
-            return 4;
-        }
+            if (G == NULL)
+            {
+                cout << "ALERTA! GRAFO NAO INICIALIZADO" << endl;
+                return 4;
+            }
 
-        cout << "Verts: " << G->V << endl;
-        cout << "Edges: " << G->E << endl << endl;
+            cout << "Verts: " << G->V << endl;
+            cout << "Edges: " << G->E << endl << endl;
         
-        vector<vector<int> > part;
+            vector<vector<int> > part;
     
-        //G->cliquePartBTE(stoi(argv[2]));
-        resultfile << filelist[index] << "\t";
-        for (int i = 10; i <= 60; i +=10)
-        {
-            part = G->cliquePartBTGA(i, 20);
-            resultfile << part.size() << "\t";
-        }
-        resultfile << endl;
-        delete G;
-        index ++;
+            //G->cliquePartBTE(stoi(argv[2]));
+            resultfile << filelist[index] << "\t";
+            for (int i = 10; i <= 60; i +=10)
+            {
+                part = G->cliquePartBTGA(i, pop);
+                cout << endl;
+                resultfile << part.size() << "\t";
+            }
+            resultfile << endl;
+            delete G;
+            index ++;
         
-        cout << endl;
+            cout << endl;
+        }
+        resultfile.close();
     }
-    resultfile.close();
     return 0;
 }

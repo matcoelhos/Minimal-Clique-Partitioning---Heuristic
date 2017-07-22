@@ -386,9 +386,25 @@ void mutation (solution * s, double mprob)
 void calcFitness (solution * s, Graph * G)
 {
     int j = 0;
+    std::vector<bool> visited(s->genotype.size(), false);
     while (j < s->genotype.size())
     {
-        G->insertInPartition(&(s->partition), s->genotype[j]);
+        if(!visited[j])
+        {
+            G->insertInPartition(&(s->partition), s->genotype[j]);
+            visited[j] = true;
+            for (int i = 0; i < G->V; i++)
+            {
+                vector<int> par;
+                par.push_back(i);
+                par.push_back(s->genotype[j]);
+                if (!visited[i] && G->existEdge(par))
+                {
+                    G->insertInPartition(&(s->partition), i);
+                    visited[i] = true;
+                }
+            }
+        }
         j++;
     }
     s->Fitness = s->partition.size();

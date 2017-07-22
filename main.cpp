@@ -99,8 +99,9 @@ int main(int argc, char * argv[])
                 cout << endl;
                 resultfile << part.size() << "\t";
             }
-            if (pop == 10) BBresultf << filelist[index] << "\t";
+            if (pop == 10) 
             {
+                BBresultf << filelist[index] << "\t";
                 for (int i = 10; i <= 60; i +=10)
                 {
                     part = G->cliquePartBTE(i);

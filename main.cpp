@@ -22,15 +22,17 @@ int main(int argc, char * argv[])
     listfile.close();
     
     
-    for (int pop = 10; pop <= 80; pop += 10)
+    for (int pop = 10; pop <= 60; pop += 10)
     {
-        stringstream fs;
+        stringstream fs,fs2;
     
-        fs << "result_p" << pop << ".txt";
+        fs << "GAresult_p" << pop << ".txt";
+        if (pop == 10) fs2 << "BBresult" << ".txt";
         cout << "Pop: " << pop << endl;
     
-        ofstream resultfile;
+        ofstream resultfile, BBresultf;
         resultfile.open(fs.str());
+        if (pop == 10) BBresultf.open(fs2.str());
     
         int index = 0;
         while (index < filelist.size()) {
@@ -97,6 +99,16 @@ int main(int argc, char * argv[])
                 cout << endl;
                 resultfile << part.size() << "\t";
             }
+            if (pop == 10) BBresultf << filelist[index] << "\t";
+            {
+                for (int i = 10; i <= 60; i +=10)
+                {
+                    part = G->cliquePartBTE(i);
+                    cout << endl;
+                    BBresultf << part.size() << "\t";
+                }
+                BBresultf << endl;
+            }
             resultfile << endl;
             delete G;
             index ++;
@@ -104,6 +116,7 @@ int main(int argc, char * argv[])
             cout << endl;
         }
         resultfile.close();
+        if (pop == 10) BBresultf.close();
     }
     return 0;
 }

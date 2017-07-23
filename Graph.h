@@ -10,8 +10,8 @@
 #include <ctime>
 #include <climits>
 #include <random>
-//#include <mingw.thread.h>   //MINGW Windows (must be included in directory)
-#include <thread>
+#include <mingw.thread.h>   //MINGW Windows (must be included in directory)
+//#include <thread>
 #include "solution.h"
 
 using namespace std;
@@ -40,6 +40,8 @@ public:
     void disp();
     //insert a node in partition
     void insertInPartition (vector<vector<int>> * part, int elem);
+    //checks if a partition is a clique
+    bool isClique(vector<int> part);
 
     ///clique partitioning
     //option 1: Greedy with heuristics
@@ -57,8 +59,6 @@ private:
     ///auxiliar functions
     //gets degrees from all the vectors
     vector<int> vertDegree();
-    //checks if a partition is a clique
-    bool isClique(vector<int> part);
 };
 
 #endif // GRAPH_H_INCLUDED

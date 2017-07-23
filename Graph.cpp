@@ -391,19 +391,25 @@ void calcFitness (solution * s, Graph * G)
     {
         if(!visited[j])
         {
-            G->insertInPartition(&(s->partition), s->genotype[j]);
+            vector<int> clique;
+            clique.push_back(s->genotype[j]);
             visited[j] = true;
-            for (int i = 0; i < G->V; i++)
+            for (int i = j+1; i < s->genotype.size(); i++)
             {
-                vector<int> par;
-                par.push_back(i);
-                par.push_back(s->genotype[j]);
-                if (!visited[i] && G->existEdge(par))
-                {
-                    G->insertInPartition(&(s->partition), i);
-                    visited[i] = true;
+                if(!visited[i])
+                {    
+                    clique.push_back(s->genotype[i]);
+                    if (G->isClique(clique))
+                    {
+                        visited[i] = true;
+                    }
+                    else
+                    {
+                        clique.pop_back();
+                    }
                 }
             }
+            s->partition.push_back(clique);
         }
         j++;
     }
